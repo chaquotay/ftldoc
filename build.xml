@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<project name="FtlDoc" default="jar" basedir=".">
+
+    <property name="lib.dir" value="lib" />
+    <property name="build.classes.dir" value="build/classes"/>
+    <property name="build.dir" value="build"/>
+    <property name="src.dir" value="src" />
+    <property name="lib.freemarker" value="${lib.dir}/freemarker.jar" />
+    <property name="lib.jcmdline" value="${lib.dir}/jcmdline-1.0.1.jar" />
+
+    <path id="compile.classpath">
+        <pathelement path="${lib.freemarker}"/>
+        <pathelement path="${lib.jcmdline}"/>
+        <pathelement path="${java.class.path}"/>
+    </path>
+
+  <target name="init">
+    <available property="freemarker-src" file="../../freemarker/build.xml"/>
+  </target>
+
+    <target depends="compile" name="jar" description="Create the ftldoc.jar">
+        <jar basedir="${build.classes.dir}" jarfile="${lib.dir}/ftldoc.jar" />
+    </target>
+
+    <target depends="init" name="compile"
+            description="Compile Java source files">
+        <mkdir dir="${build.dir}"/>
+        <mkdir dir="${lib.dir}"/>
+        <mkdir dir="${build.classes.dir}"/>
+        <javac deprecation="off" destdir="${build.classes.dir}" debug="on" optimize="off">
+            <src path="${src.dir}"/>
+            <classpath refid="compile.classpath"/>
+        </javac>
+        <copy toDir="${build.classes.dir}">
+            <fileset dir="${src.dir}" includes="**/*.ftl"/>
+        </copy>
+    </target>
+
+    <!--
+    <target name="update-jar" depends="init" if="freemarker-src">
+        <ant dir="../../freemarker" target="jar"/>
+        <copy file="../../freemarker/lib/freemarker.jar" toDir="lib"/>
+    </target>
+    -->
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+    </target>
+  
+    <target name="all" depends="clean, jar"/>
+
+</project>
