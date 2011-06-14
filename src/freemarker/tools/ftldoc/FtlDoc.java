@@ -90,13 +90,14 @@ public class FtlDoc {
             return ((Map)o1).get("name").toString().toLowerCase().compareTo(((Map)o2).get("name").toString().toLowerCase());
         }
     };
-    
+
+    private static final Pattern LINESPLIT_PATTERN = Pattern.compile("(\\r\\n)|(\\r)|(\\n)");
     private static final Pattern PARAM_PATTERN = Pattern.compile("^\\s*(?:--)?\\s*@param\\s*(\\w*)\\s*(.*)$");
     private static final Pattern AT_PATTERN = Pattern.compile("^\\s*(?:--)?\\s*(@\\w+)\\s*(.*)$");
     private static final Pattern TEXT_PATTERN = Pattern.compile("^\\s*(?:--)?(.*)$");
-    
+
     private static final String FTLDOC_TEMPLATE_PATH = "templates/file.ftl";
-    
+
     private SortedMap allCategories = null;
     private SortedMap categories = null;
     private List allMacros = null;
@@ -308,10 +309,10 @@ public class FtlDoc {
             
             te = t.getRootTreeNode();
             if(te.getClass().getName().endsWith("MixedContent")) {
-                Enumeration enum = te.children();
-                while (enum.hasMoreElements())
+                Enumeration children = te.children();
+                while (children.hasMoreElements())
                 {
-                    Object element = enum.nextElement();
+                    Object element = children.nextElement();
                     if(element instanceof Comment) {
                         Comment candidate = (Comment)element;
                         if(candidate.getText().startsWith("-")) {
@@ -573,9 +574,10 @@ public class FtlDoc {
         // remove leading hyphen (last hyphen of '<#---')
         String fixedComment = comment.getText().substring(1);
         StringBuffer bufText = new StringBuffer();
-        String[] lines = fixedComment.split("\n");
+
+        String[] lines = LINESPLIT_PATTERN.split(fixedComment);
         String line;
-        
+
         for(int i = 0;i<lines.length;i++) {
             line = lines[i];
             if ((m = PARAM_PATTERN.matcher(line)).matches()) {
@@ -592,7 +594,7 @@ public class FtlDoc {
                 // one can prove (with some automat theory) that the
                 // TEXT_PATTERN regex matches *every* string. Under normal
                 // circumstances this else block can never be reached.
-                System.err.println("WARNING: reached unreachable point");
+                System.err.println("WARNING: reached unreachable point: " + line);
             }
         }
         String text = bufText.toString().replaceAll("\n","");

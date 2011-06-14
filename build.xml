@@ -45,7 +45,26 @@
     <target name="clean">
         <delete dir="${build.dir}"/>
     </target>
-  
-    <target name="all" depends="clean, jar"/>
+
+    <target name="assemble" depends="jar">
+        <copydir dest="build/lib" src="lib">
+            <include name="*.jar" />
+        </copydir>
+        <copydir dest="build" src=".">
+            <include name="ftldoc.sh" />
+            <include name="ftldoc.bat" />
+        </copydir>
+    </target>
+
+    <target name="zip" depends="assemble">
+        <zip destfile="build/ftldoc.zip">
+            <zipfileset dir="build">
+                <include name="**/*.jar" />
+                <include name="ftldoc.*" />
+            </zipfileset>
+
+        </zip>
+
+    </target>
 
 </project>
